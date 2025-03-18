@@ -24,4 +24,18 @@
       - Compilador: Cocoa Touch (SDK)
       - Plataformas: Mac
     
-    - MultiplataformaE
+    - Multiplataforma
+
+      - React Native
+      - Linguagem: JavaScript
+      - Gera APK nativos
+
+      - Flutter (nosso)
+      - Linguagem: Dart
+      - Gera APK nativos
+    
+    - Ionic 
+    - Java Script
+    - Não Gera APK nativos (runTime) 
+
+
