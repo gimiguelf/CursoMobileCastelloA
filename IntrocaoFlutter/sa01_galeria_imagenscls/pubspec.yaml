@@ -1,4 +1,4 @@
-name: exercicio_layout
+name: sa01_galeria_imagenscls
 description: "A new Flutter project."
 publish_to: 'none'
 version: 0.1.0
@@ -9,6 +9,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  carousel_slider: ^5.0.0
 
 dev_dependencies:
   flutter_test:
@@ -17,6 +18,3 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
-  assets:
-    - assets/img/
-    
