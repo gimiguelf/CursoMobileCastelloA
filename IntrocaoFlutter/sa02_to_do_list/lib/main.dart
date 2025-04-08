@@ -45,11 +45,20 @@ class _ToDoListAppState extends State<ToDoListApp>{
                     title: Text(_tarefa[index]["titulo"], 
                       style: TextStyle(
                         //condição para decoração do texto
-                        decoration: _tarefa[index]["concluida"] ? TextDecoration.lineThrough : null,// operador ternario
+                        decoration: _tarefa[index]["concluida"] ? TextDecoration.lineThrough : null,// operador ternário
                       ),),
+                    leading: Checkbox(
+                      value: _tarefa[index]["concluida"], 
+                      onChanged: (bool? valor) => setState(() {
+                        _tarefa[index]["concluida"] = valor!;
+                      })),  
                   ) 
               ),
-            )
+            ),
+            ElevatedButton(
+              onPressed: _removerConcluidas, 
+              child: Text("Remover Concluídas"),
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.red))
           ],
         ),
       ),
@@ -57,6 +66,18 @@ class _ToDoListAppState extends State<ToDoListApp>{
   }
 
   void _adicionarTarefa() {
+    if(_tarefaController.text.trim().isNotEmpty){
+      setState(() {
+        //para cada tarefa adicionada ( titulo, concluida)
+        _tarefa.add({"titulo":_tarefaController.text,"concluida":false});
+        _tarefaController.clear();
+      });
+    }
   }
-}
 
+  void _removerConcluidas() {
+    setState(() {
+      _tarefa.removeWhere((tarefa)=>tarefa["concluida"]);
+    });
+  }
+} 
