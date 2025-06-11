@@ -4,7 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:sa_petshop/controllers/consulta_controller.dart';
 import 'package:sa_petshop/controllers/pet_controller.dart';
 import 'package:sa_petshop/models/consulta_model.dart';
-import 'package:sa_petshop/models/pet_model.dart';
+import 'package:sa_petshop/models/pet_models.dart';
+import 'package:sa_petshop/views/criar_consultas_scren.dart';
 
 class DetalhePetScreen extends StatefulWidget{
   //atributos
@@ -87,15 +88,38 @@ class _DetalhePetScreenState extends State<DetalhePetScreen> {
                         child: ListTile(
                           title: Text(consulta.tipoServico),
                           subtitle: Text(consulta.dataHoraLocal),
-                          //trailing:, //apagar a consulta
-                          //ontap: (){}//implementar a navegação para detalhes da consultas
+                          trailing: IconButton(
+                            onPressed: ()=>_deletarConsulta(consulta.id!), 
+                            icon: Icon(Icons.delete)),//apagar a consulta
+                          //onTap: (){}//implementar a navegação para detalhes da consulta
                         ),
                       );
                     }))
               ],
             ),),
-            //floatingActionButton: //navegar para o formulario de criação de consulta 
-            //cenas para o proximo capitulo -> tela de criação de consultas, e implementar os metodos que faltam, (deletar consultas, deletar Pet, )
+      floatingActionButton: FloatingActionButton(
+        onPressed: () async{
+          Navigator.push(context, MaterialPageRoute(
+            builder: (context)=>CriarConsultaScreen(widget.petId)));
+        },
+        child: Icon(Icons.add),)
+      //cenas do próximo capítulo -> tela de criação de consultas, implementar os métodos que faltam (deletar consluta, deletar Pet, )
     );
   }
+
+  //método para Deletar Consulta
+  _deletarConsulta(int id) async{
+    try {
+      _controllerConsulta.deleteConsulta(id);
+      _carregarDados();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Consulta Apagada com Sucesso"))
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Exception: $e"))
+      );
+    }
+  }
+
 }
