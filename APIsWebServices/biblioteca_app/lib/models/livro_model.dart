@@ -1,11 +1,11 @@
 class LivroModel {
-   //atributos
+  //atributos
   final String? id; //pode ser nulo inicialmente
   final String titulo;
   final String autor;
   final bool disponivel;
 
-    //construtor
+  //construtor
   LivroModel({
     this.id, required this.titulo, required this.autor, required this.disponivel
   });

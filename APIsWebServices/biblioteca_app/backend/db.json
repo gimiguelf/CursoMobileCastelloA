@@ -2,7 +2,7 @@
   "usuarios": [
     {
       "id": "1",
-      "nome": "Maria Souza",
+      "nome": "Maria Julia",
       "email": "maria@email.com"
     },
     {
@@ -11,23 +11,44 @@
       "email": "joao@email.com"
     },
     {
-      "id": "1",
+      "id": "3",
       "nome": "Pedro",
       "email": "pedro@email.com"
+    },
+    {
+      "id": "4",
+      "nome": "Cláudia",
+      "email": "claudia@email.com"
+    },
+    {
+      "id": "5",
+      "nome": "Paulo",
+      "email": "paulo@email.com"
+    },
+    {
+      "id": "27",
+      "nome": "Marcio",
+      "email": "marcio@email.com"
     }
   ],
   "livros": [
     {
-      "id": "1",
-      "titulo": "O Guia do Mochileiro das Galáxias",
-      "autor": "Douglas Adams",
-      "disponivel": false
+      "id": "4",
+      "titulo": "O Pequeno Príncipe",
+      "autor": "Antoine de Saint-Exupéry",
+      "disponivel": true
     },
     {
-      "id": "2",
-      "titulo": "Memórias Póstumas de Brás Cubas",
-      "autor": "Machado de Assis",
+      "id": "5",
+      "titulo": "Capitães da Areia",
+      "autor": "Jorge Amado",
       "disponivel": true
+    },
+    {
+      "id": "230",
+      "titulo": "Verity",
+      "autor": "Colleen Over",
+      "disponbivel": true
     }
   ],
   "emprestismo": [
@@ -35,8 +56,8 @@
       "id": "1",
       "usuarioId": 1,
       "livroId": 1,
-      "dataEmprestimo": "2025-08-27",
-      "dataDevolucao": "2025-09-06",
+      "dataEmprestimo": "2025-09-03",
+      "dataDevolucao": "2025-10-06",
       "devolvido": false
     }
   ]

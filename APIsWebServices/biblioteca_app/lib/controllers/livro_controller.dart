@@ -13,7 +13,7 @@ class LivroController {
   }
   //Get Usuário
   Future<LivroModel> fetchOne(String id) async{
-    final user = await ApiService.getOne("llivros", id);
+    final user = await ApiService.getOne("livros", id);
     return LivroModel.fromJson(user);
   }
 
