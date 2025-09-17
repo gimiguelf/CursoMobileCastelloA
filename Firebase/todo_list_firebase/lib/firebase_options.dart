@@ -59,4 +59,5 @@ class DefaultFirebaseOptions {
     projectId: 'todolist-f98fd',
     storageBucket: 'todolist-f98fd.firebasestorage.app',
   );
+
 }
