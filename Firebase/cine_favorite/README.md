@@ -71,21 +71,38 @@ classDiagram
 
 2. ### Diagrama de Uso
 
+- Usuário (User)
+    - Criar Conta
+    - Login
+    - Logout
+
+- Filme (Movie)
+    - Selecionar Filme
+    - Adicionar aos Favoritos
+    - Remover dos Favoritos
+    - Atualizar Nota
+    - Visualizar Filmes
+
 ```mermaid
 
-usecase
-    (Criar Conta) --> (User)
-    (Login) --> (User)
-    (Logout) --> (User)
-
-    (Buscar Filmes) --> (Movie)
-    (Selecionar Filme) --> (Movie)
-    (Adicionar aos Favoritos) --> (Movie)
-    (Remover dos Favoritos) --> (Movie)
-    (Atualizar Nota) --> (Movie)
-    (Visualizar Lista de Favoritos) --> (Movie)
+usecaseDiagram
+    usecase{
+        (Criar Conta) --> (User)
+        (Login) --> (User)
+        (Logout) --> (User)
+    }
+    
+    usecase{
+        (Buscar Filmes) --> (Movie)
+        (Selecionar Filme) --> (Movie)
+        (Adicionar aos Favoritos) --> (Movie)
+        (Remover dos Favoritos) --> (Movie)
+        (Atualizar Nota) --> (Movie)
+        (Visualizar Lista de Favoritos) --> (Movie)
+    }
 
 ```
+
 
 3. ### Diagrama de Fluxo
 
