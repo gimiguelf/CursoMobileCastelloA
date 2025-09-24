@@ -73,7 +73,7 @@ classDiagram
 
 ```mermaid
 
-usecaseDiagram
+usecase
     (Criar Conta) --> (User)
     (Login) --> (User)
     (Logout) --> (User)
