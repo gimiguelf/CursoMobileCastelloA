@@ -37,4 +37,4 @@ class Movie {
       rating: (map["rating"] as num).toDouble());
   }
 
-} 
+}

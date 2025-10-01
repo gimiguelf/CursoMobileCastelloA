@@ -13,7 +13,7 @@ class TmdbService {
 
   //método static => métodos da Classe -> não preciso instanciar um OBJ para executar o método
 
-  //buscar filme na API
+  //buscar filme na API pelo Termo
   static Future<List<Map<String,dynamic>>> searchMovie(String movie) async{
     //converter a String em URL
     final apiURI = Uri.parse("$_baseURL/search/movie?api_key=$_apiKey&query=$movie&language=$_idioma");
@@ -31,5 +31,7 @@ class TmdbService {
       throw Exception("Falha ao Carregar Filmes da API");
     }
   }
+
+  //método para busca filme pelo ID
 
 }

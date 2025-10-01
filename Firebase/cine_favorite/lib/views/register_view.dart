@@ -1,61 +1,89 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
-class RegisterView extends StatelessWidget {
+class RegisterView extends StatefulWidget {
   const RegisterView({super.key});
 
   @override
+  State<RegisterView> createState() => _RegisterViewState();
+}
+
+class _RegisterViewState extends State<RegisterView> {
+  //atributos
+  final _emailField = TextEditingController();
+  final _senhaField = TextEditingController();
+  final _confSenhaField = TextEditingController();
+  final _authController = FirebaseAuth.instance; //controlador do Firebase Auth
+  bool _senhaOculta = true;
+  bool _confSenhaOculta = true;
+
+  //método _registrar
+  void _registrar() async{
+    if(_senhaField.text != _confSenhaField.text) return;//interrompe o método se senhas diferentes
+    try {
+      await _authController.createUserWithEmailAndPassword(
+        email: _emailField.text.trim(), 
+        password: _senhaField.text);
+      Navigator.pop(context); //fecha a tela de Registro
+      // é logado automaticamente após o cadastro
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Falha ao registrar: $e"))
+      );
+    }
+  }
+
+  //build da tela
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(24.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Text(
-                'Cadastro',
-                style: TextStyle(fontSize: 40, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 40),
-              const TextField(
-                decoration: InputDecoration(
-                  labelText: 'Email',
-                  border: OutlineInputBorder(),
+      appBar: AppBar(title: Text("Registro")),
+      body: Padding(
+        padding: EdgeInsets.all(16),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            TextField(
+              controller: _emailField,
+              decoration: InputDecoration(labelText: "Email"),
+              keyboardType: TextInputType.emailAddress,
+            ),
+            TextField(
+              controller: _senhaField,
+              decoration: InputDecoration(
+                labelText: "Senha",
+                suffix: IconButton(
+                  onPressed: () => setState(() {
+                    _senhaOculta =
+                        !_senhaOculta; //inverte o valor da variável booleana
+                  }),
+                  icon: _senhaOculta
+                      ? Icon(Icons.visibility)
+                      : Icon(Icons.visibility_off),
                 ),
               ),
-              const SizedBox(height: 16),
-              const TextField(
-                decoration: InputDecoration(
-                  labelText: 'Nome de Usuário',
-                  border: OutlineInputBorder(),
+              obscureText: _senhaOculta,
+            ),
+            TextField(
+              controller: _confSenhaField,
+              decoration: InputDecoration(
+                labelText: "Senha",
+                suffix: IconButton(
+                  onPressed: () => setState(() {
+                    _confSenhaOculta =
+                        !_confSenhaOculta; //inverte o valor da variável booleana
+                  }),
+                  icon: _confSenhaOculta
+                      ? Icon(Icons.visibility)
+                      : Icon(Icons.visibility_off),
                 ),
               ),
-              const SizedBox(height: 16),
-              const TextField(
-                obscureText: true,
-                decoration: InputDecoration(
-                  labelText: 'Senha',
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              const SizedBox(height: 16),
-              const TextField(
-                obscureText: true,
-                decoration: InputDecoration(
-                  labelText: 'Confirme sua senha',
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              const SizedBox(height: 24),
-              ElevatedButton(
-                onPressed: () {},
-                style: ElevatedButton.styleFrom(
-                  minimumSize: const Size(double.infinity, 50),
-                ),
-                child: const Text('Cadastrar'),
-              ),
-            ],
-          ),
+              obscureText: _confSenhaOculta,
+            ),
+
+            SizedBox(height: 20),
+            ElevatedButton(onPressed: _registrar, child: Text("Registrar")),
+          ],
         ),
       ),
     );
