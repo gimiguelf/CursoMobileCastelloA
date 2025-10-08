@@ -12,71 +12,212 @@ class FavoriteView extends StatefulWidget {
   State<FavoriteView> createState() => _FavoriteViewState();
 }
 
-class _FavoriteViewState extends State<FavoriteView> {
+class _FavoriteViewState extends State<FavoriteView>
+    with SingleTickerProviderStateMixin {
   final _movieController = MovieFirestoreController();
+  final TextEditingController _searchController = TextEditingController();
+  late TabController _tabController;
 
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 4, vsync: this);
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    _searchController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Meus Filmes Favoritos"),
-        actions: [IconButton(
-          onPressed: FirebaseAuth.instance.signOut, 
-          icon: Icon(Icons.logout))],
-      ),
-      //listener ( StreamBuilder) para construir a tela de acordo 
-      //com o resultado da lista de favoritos
-      body: StreamBuilder<List<Movie>>(
-        //buscar a lista de filmes Favoritos no FireStore
-        stream: _movieController.getFavoriteMovies(),
-        builder: (context, snapshot){
-          //se deu erro de conexão
-          if(snapshot.hasError){
-            return Center(child: Text("Erro ao Carregar a Lista de Favoritos"),);
-          }
-          //enquanto esta conectadno com o firestore
-          if(!snapshot.hasData){//verifica se os dados estão vazios e tranforma em booleana
-            return Center(child: CircularProgressIndicator(),);
-          }
-          //quando a lista de filme esta vazia
-          if(snapshot.data!.isEmpty){//o retorno da lista esta vazio
-            return Center(child: Text("Nenhum Filme Adicionado aos Favoritos"),);
-          }
-          //quando existe filme na lista
-          final favoriteMovies = snapshot.data!;
-          return Expanded( // container que permite o scroll da tela
-            child: GridView.builder(
-              padding: EdgeInsets.all(8),
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2, //numero de colunas
-                crossAxisSpacing: 8, //espacamento entre colunas vertical
-                mainAxisSpacing: 8, // espacamento entre linhas horizontal
-                childAspectRatio: 0.7),
-              itemCount: favoriteMovies.length, //proporção entre a imagem
-              itemBuilder: (context, index){
-                //criar um obj de movie
-                final movie = favoriteMovies[index];
-                return Card(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      //criar uma ação para remover o filme da lista de favoritos (GestureDetector)
-                      Expanded(child: Image.file(File(movie.posterPath), fit: BoxFit.cover,)),
-                      Center(child: Text(movie.title),),
-                      //criar uma ação para alterar a nota do filme
-                      Center(child: Text("Nota do Filme: ${movie.rating}"),)
-                      // usar estrelas, usar slider, barRating ou mesmo a nota numerica
-                    ],
-                  ),
-                );
-              }));
-        }),
-      floatingActionButton: FloatingActionButton(
-        onPressed: ()=> Navigator.push(context, 
-          MaterialPageRoute(builder: (context) => SearchMovieView())),
-        child: Icon(Icons.search),),
-    );
+    final Color softBlue = const Color(0xFFDBEAFE); // azul clarinho
+    final Color accentBlue = const Color(0xFF60A5FA); // azul do botão/lupa
 
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        backgroundColor: softBlue,
+        elevation: 0,
+        title: const Text(
+          "Favoritos",
+          style: TextStyle(
+            color: Colors.black87,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+        centerTitle: true,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout, color: Colors.black54),
+            onPressed: FirebaseAuth.instance.signOut,
+          ),
+        ],
+      ),
+      body: Column(
+        children: [
+          // Campo de busca
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 10, 16, 0),
+            child: TextField(
+              controller: _searchController,
+              decoration: InputDecoration(
+                hintText: "Search favorites",
+                prefixIcon: Icon(Icons.search, color: accentBlue),
+                filled: true,
+                fillColor: Colors.white,
+                contentPadding:
+                    const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(30),
+                  borderSide: BorderSide(color: softBlue),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(30),
+                  borderSide: BorderSide(color: accentBlue),
+                ),
+              ),
+            ),
+          ),
+
+          // Tabs
+          TabBar(
+            controller: _tabController,
+            indicatorColor: accentBlue,
+            labelColor: accentBlue,
+            unselectedLabelColor: Colors.black54,
+            labelStyle:
+                const TextStyle(fontWeight: FontWeight.w500, fontSize: 14),
+            tabs: const [
+              Tab(text: "Favorites"),
+              Tab(text: "Top 10"),
+              Tab(text: "Popular"),
+              Tab(text: "Downloaded"),
+            ],
+          ),
+
+          // Conteúdo das abas
+          Expanded(
+            child: TabBarView(
+              controller: _tabController,
+              children: [
+                // Aba "Favorites"
+                _buildFavoritesTab(),
+                _buildPlaceholder("Top 10 ainda não disponível"),
+                _buildPlaceholder("Populares em breve"),
+                _buildPlaceholder("Downloadados em breve"),
+              ],
+            ),
+          ),
+        ],
+      ),
+
+      // Botão de busca
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: accentBlue,
+        onPressed: () => Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const SearchMovieView()),
+        ),
+        child: const Icon(Icons.search, color: Colors.white),
+      ),
+    );
+  }
+
+  Widget _buildFavoritesTab() {
+    return StreamBuilder<List<Movie>>(
+      stream: _movieController.getFavoriteMovies(),
+      builder: (context, snapshot) {
+        if (snapshot.hasError) {
+          return const Center(
+              child: Text("Erro ao carregar a lista de favoritos"));
+        }
+
+        if (!snapshot.hasData) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        final favoriteMovies = snapshot.data!;
+        if (favoriteMovies.isEmpty) {
+          return const Center(
+              child: Text("Nenhum filme adicionado aos favoritos"));
+        }
+
+        return Padding(
+          padding: const EdgeInsets.all(8),
+          child: GridView.builder(
+            itemCount: favoriteMovies.length,
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              crossAxisSpacing: 10,
+              mainAxisSpacing: 10,
+              childAspectRatio: 0.65,
+            ),
+            itemBuilder: (context, index) {
+              final movie = favoriteMovies[index];
+              return Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.2),
+                      blurRadius: 6,
+                      offset: const Offset(0, 3),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Expanded(
+                      child: ClipRRect(
+                        borderRadius: const BorderRadius.vertical(
+                            top: Radius.circular(16)),
+                        child: Image.file(
+                          File(movie.posterPath),
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 6, vertical: 4),
+                      child: Text(
+                        movie.title,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                            fontWeight: FontWeight.w500, fontSize: 14),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 6),
+                      child: Text(
+                        "Nota: ${movie.rating}",
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                            color: Colors.black54, fontSize: 12),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildPlaceholder(String text) {
+    return Center(
+      child: Text(
+        text,
+        style: const TextStyle(color: Colors.black54),
+      ),
+    );
   }
 }
