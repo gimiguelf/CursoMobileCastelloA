@@ -103,3 +103,79 @@ Permissões de Localização: Resolvido usando a função de solicitação do pa
 Biometria: Foi adicionado um método alternativo de login (NIF/Senha) caso o reconhecimento facial falhe.
 
 Cálculo de Distância (100m): Feito com o método distanceBetween do geolocator, que usa a fórmula de Haversine para garantir precisão.
+
+Diagramas do Sistema
+
+1. Diagrama de Classes
+
+```mermaid
+classDiagram
+    class Usuario {
+        +String uid
+        +String nome
+        +String email
+    }
+
+    class RegistroPonto {
+        +String usuario
+        +double latitude
+        +double longitude
+        +DateTime dataHora
+        +toMap()
+    }
+
+    class RegistroController {
+        +pegarLocalizacao()
+        +registrarPonto(latitude, longitude)
+    }
+
+    class LoginView
+    class DashboardView
+    class HistoricoView
+
+    Usuario --> RegistroPonto
+    RegistroController --> RegistroPonto
+    RegistroController --> FirebaseAuth
+    RegistroController --> FirebaseFirestore
+    LoginView --> RegistroController
+    DashboardView --> RegistroController
+    HistoricoView --> RegistroController
+```
+
+2. Diagrama de Casos de Uso
+
+```mermaid
+usecaseDiagram
+    actor Funcionario
+
+    Funcionario --> (Login com NIF/Email e Senha)
+    Funcionario --> (Login com Biometria)
+    Funcionario --> (Registrar Ponto)
+    Funcionario --> (Visualizar Histórico de Pontos)
+    Registrar Ponto --> (Validar Localização)
+    Registrar Ponto --> (Salvar Registro no Firebase)
+```
+
+3. Diagrama de Sequência
+
+```mermaid
+sequenceDiagram
+    participant Funcionario
+    participant DashboardView
+    participant RegistroController
+    participant Geolocator
+    participant FirebaseFirestore
+
+    Funcionario->>DashboardView: Clica em "Registrar Ponto"
+    DashboardView->>RegistroController: chamar pegarLocalizacao()
+    RegistroController->>Geolocator: solicita posição atual
+    Geolocator-->>RegistroController: retorna latitude/longitude
+    RegistroController->>RegistroController: calcula distância da empresa
+    alt Dentro de 100m
+        RegistroController->>FirebaseFirestore: salvar registro (data, hora, coordenadas)
+        FirebaseFirestore-->>RegistroController: confirmação
+        RegistroController-->>DashboardView: ponto registrado com sucesso
+    else Fora do alcance
+        RegistroController-->>DashboardView: mostra alerta de localização inválida
+    end
+```
