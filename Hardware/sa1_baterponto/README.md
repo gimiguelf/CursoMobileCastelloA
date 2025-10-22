@@ -148,12 +148,19 @@ classDiagram
 usecaseDiagram
     actor Funcionario
 
-    Funcionario --> (Login com NIF/Email e Senha)
-    Funcionario --> (Login com Biometria)
-    Funcionario --> (Registrar Ponto)
-    Funcionario --> (Visualizar Histórico de Pontos)
-    Registrar Ponto --> (Validar Localização)
-    Registrar Ponto --> (Salvar Registro no Firebase)
+    UC_Login as (Login com NIF/Email e Senha)
+    UC_Biometria as (Login com Biometria)
+    UC_Registrar as (Registrar Ponto)
+    UC_Historico as (Visualizar Histórico de Pontos)
+    UC_Validar as (Validar Localização)
+    UC_Salvar as (Salvar Registro no Firebase)
+
+    Funcionario --> UC_Login
+    Funcionario --> UC_Biometria
+    Funcionario --> UC_Registrar
+    Funcionario --> UC_Historico
+    UC_Registrar --> UC_Validar
+    UC_Registrar --> UC_Salvar
 ```
 
 3. Diagrama de Sequência
