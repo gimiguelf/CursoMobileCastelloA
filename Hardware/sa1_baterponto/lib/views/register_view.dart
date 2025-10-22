@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'home_view.dart'; // Sua tela inicial
+import 'home_view.dart'; // Tela principal após login/cadastro
 
 class RegisterPage extends StatefulWidget {
   @override
@@ -11,15 +11,15 @@ class _RegisterPageState extends State<RegisterPage> {
   final _emailController = TextEditingController();
   final _senhaController = TextEditingController();
 
+  // Função para registrar o usuário no Firebase
   Future<void> _register() async {
     try {
-      // Tenta criar um novo usuário no Firebase
       await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: _emailController.text,
         password: _senhaController.text,
       );
 
-      // Se for bem-sucedido, vai para a tela inicial
+      // Se der certo, vai para a tela inicial
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => HomePage()),
@@ -30,6 +30,7 @@ class _RegisterPageState extends State<RegisterPage> {
       );
 
     } on FirebaseAuthException catch (e) {
+      // Tratamento de erros específicos do Firebase
       String message;
       if (e.code == 'weak-password') {
         message = 'A senha deve ter pelo menos 6 caracteres.';
@@ -40,11 +41,12 @@ class _RegisterPageState extends State<RegisterPage> {
       } else {
         message = 'Erro ao cadastrar: ${e.message}';
       }
-      
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(message)),
       );
     } catch (e) {
+      // Erro genérico
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Ocorreu um erro inesperado: $e')),
       );
@@ -53,6 +55,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
   @override
   Widget build(BuildContext context) {
+    // Interface simples de cadastro com campos de e-mail e senha
     return Scaffold(
       appBar: AppBar(title: const Text('Novo Cadastro')),
       body: Padding(
