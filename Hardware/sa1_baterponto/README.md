@@ -144,6 +144,7 @@ classDiagram
 
 2. Diagrama de Casos de Uso
 
+
 ```mermaid
 usecaseDiagram
     actor Funcionario
