@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:geolocator/geolocator.dart';
-import '../controllers/ponto_controller.dart'; // Certifique-se de que o nome do Controller está correto
+import '../controllers/ponto_controller.dart'; // Verifique se o nome do controller está correto
 import 'hist_view.dart';
 
 class HomePage extends StatefulWidget {
@@ -13,22 +13,21 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  final controller = RegistroController(); // Assumo que RegistroController é seu BP_controller
+  final controller = RegistroController(); // Controlador de registro
   final Distance distance = Distance();
   final MapController mapController = MapController();
 
-  // Coordenadas da sua empresa (CCS Limeira)
+  // Local da empresa (CCS Limeira)
   final LatLng empresaLocal = LatLng(-22.5703659, -47.4471221);
 
   LatLng? posicaoAtual;
   String status = 'Pressione o botão para marcar ponto';
   bool dentroDaArea = false;
-  // NOVO: Variável para controlar o estado de processamento
-  bool _isProcessing = false; 
+  bool _isProcessing = false; // Controle de carregamento
 
-  // Função para pegar a localização atual do usuário
+  // Obtém a localização atual
   Future<void> _pegarLocalizacao() async {
-    if (_isProcessing) return; // Ignora se já estiver processando
+    if (_isProcessing) return; // Evita duplicar processo
 
     setState(() {
       _isProcessing = true;
@@ -53,26 +52,25 @@ class _HomePageState extends State<HomePage> {
         SnackBar(content: Text('Erro ao obter localização: $e')),
       );
     } finally {
-      // Garante que o estado seja redefinido
       setState(() {
         _isProcessing = false;
       });
     }
   }
 
-  // Função para registrar ponto
+  // Registra o ponto atual
   Future<void> _registrarPonto() async {
-    if (_isProcessing) return; // Ignora se já estiver processando
+    if (_isProcessing) return; // Evita repetição
     
     setState(() {
-      _isProcessing = true; // Inicia o processamento
+      _isProcessing = true;
       status = 'Registrando ponto...';
     });
 
     try {
       Position pos;
       if (posicaoAtual != null) {
-        // Se a localização já foi verificada, usa a última
+        // Usa a última localização
         pos = Position(
           latitude: posicaoAtual!.latitude,
           longitude: posicaoAtual!.longitude,
@@ -86,7 +84,7 @@ class _HomePageState extends State<HomePage> {
           headingAccuracy: 0,
         );
       } else {
-        // Se não foi verificada, pega agora (operação demorada)
+        // Obtém nova localização
         pos = await controller.pegarLocalizacao();
       }
 
@@ -100,7 +98,7 @@ class _HomePageState extends State<HomePage> {
       });
 
       if (dentro) {
-        await controller.registrarPonto( // Outra operação que pode ser lenta (I/O)
+        await controller.registrarPonto( // Salva no banco
           latitude: pos.latitude,
           longitude: pos.longitude,
         );
@@ -119,37 +117,36 @@ class _HomePageState extends State<HomePage> {
         SnackBar(content: Text('Erro ao registrar ponto: $e')),
       );
     } finally {
-      // Garante que o estado seja redefinido
       setState(() {
         _isProcessing = false;
       });
     }
   }
 
-  // NOVO MÉTODO: Cria o conteúdo do botão, incluindo o spinner
+  // Retorna o conteúdo do botão com ícone ou carregamento
   Widget _buildButtonChild(String label, IconData icon) {
-      if (_isProcessing) {
-        return const SizedBox(
-          width: 20,
-          height: 20,
-          child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
-        );
-      }
-      return Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon),
-          const SizedBox(width: 8),
-          Text(label),
-        ],
+    if (_isProcessing) {
+      return const SizedBox(
+        width: 20,
+        height: 20,
+        child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
       );
     }
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(icon),
+        const SizedBox(width: 8),
+        Text(label),
+      ],
+    );
+  }
     
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('CCS limeira'),
+        title: const Text('CCS Limeira'),
         actions: [
           IconButton(
             icon: const Icon(Icons.access_time),
@@ -210,12 +207,12 @@ class _HomePageState extends State<HomePage> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              // BOTÃO 'Ver Localização' - Desabilitado durante o processamento
+              // Botão de localização (desativado se processando)
               ElevatedButton(
                 onPressed: _isProcessing ? null : _pegarLocalizacao,
                 child: _buildButtonChild('Ver Localização', Icons.my_location),
               ),
-              // BOTÃO 'Registrar Ponto' - Desabilitado durante o processamento
+              // Botão de registro (desativado se processando)
               ElevatedButton(
                 onPressed: _isProcessing ? null : _registrarPonto,
                 child: _buildButtonChild('Registrar Ponto', Icons.fingerprint),
